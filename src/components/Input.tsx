@@ -85,9 +85,6 @@ const Input = () => {
        
     }, [state.is_not_connected, dispatch])
 
-    // useEffect(() => {
-    //     setUrl(Url)
-    // })
     const isValidVideoParam = (vParam: string): boolean => {
         let videoParamLength = 11;
         return vParam.length === videoParamLength;
@@ -141,50 +138,26 @@ const Input = () => {
     }
 
 
-    const Get_Detail = async (textarea: String) => {
-        let url;
-        let isOneVideoUrl;
-        let isPlaylistUrl;
-        let urlParams;
+    const Get_Detail = async (textarea: string) => {
+        let url = textarea.split('\n')[0];
         let isValidLinkPattern = /^https:\/\/www\.youtube\.com\/(watch|playlist)\?/;
         dispatch({ data: false, type: 'isError' });
         SetAllDetail({ type: 'empty' });
 
-        if (textarea === "") {
-            return 0;
-        }
-
-        const AllUrl = textarea.split('\n');
-
-
-        for await (url of AllUrl) {
-            isOneVideoUrl = false;
-            isPlaylistUrl = false;
-            if (isValidLinkPattern.test(url)) {
-                urlParams = (new URL(url)).searchParams;
-                if (urlParams.has('list')) {
-                    isPlaylistUrl = isValidListParam(urlParams.get('list'));
-                } else if (urlParams.has('v')) {
-                    isOneVideoUrl = isValidVideoParam(urlParams.get('v'));
-                }
+        if (isValidLinkPattern.test(textarea)) {
+            let urlParams = (new URL(url)).searchParams;
+            let getParam = (param: string): string => {
+                let paramValue = urlParams.get(param)
+                return paramValue ? paramValue : ''
             }
-
-            if (url !== "") {
-                // one video url  
-                if (isOneVideoUrl) {
-                    oneVideo(url);
-                }
-                // playlist url
-                else if (isPlaylistUrl) {
-                    onePlaylist(url);
-                }
-                // Url is wrong
-                else {
-                    dispatch({type: 'isError', data: {isError: true, text: 'Please enter a valid YouTube URL'}});
-                }
+            if (urlParams.has('v') && isValidVideoParam(getParam('v'))) {
+                return oneVideo(url);
+            }
+            if (urlParams.has('list') && isValidListParam(getParam('list'))) {
+                return onePlaylist(url);
             }
         }
-        return false;
+        return dispatch({type: 'isError', data: {isError: true, text: 'Please enter a valid YouTube URL'}});
     }
 
 
