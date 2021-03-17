@@ -150,11 +150,11 @@ const Input = () => {
                 let paramValue = urlParams.get(param)
                 return paramValue ? paramValue : ''
             }
-            if (urlParams.has('v') && isValidVideoParam(getParam('v'))) {
-                return oneVideo(url);
-            }
             if (urlParams.has('list') && isValidListParam(getParam('list'))) {
                 return onePlaylist(url);
+            }
+            if (urlParams.has('v') && isValidVideoParam(getParam('v'))) {
+                return oneVideo(url);
             }
         }
         return dispatch({type: 'isError', data: {isError: true, text: 'Please enter a valid YouTube URL'}});
